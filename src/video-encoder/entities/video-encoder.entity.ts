@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum VideoEncoderStatus {
     PENDING = 'pending',
@@ -31,9 +31,9 @@ export class VideoEncoder  {
     @Column({ default: false })
     isCompleted: boolean;
 
-    @Column()
+    @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column()
+    @CreateDateColumn()
     createdAt: Date;
 }

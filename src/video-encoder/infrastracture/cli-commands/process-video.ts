@@ -14,7 +14,8 @@ export class ProcessVideo extends CommandRunner {
     passedParam: string[],
     options?: BasicCommandOptions,
   ): Promise<void> {
-    this.processVideoHandler.start();
+    await this.processVideoHandler.start();
+    process.exit(0);
   }
 
   @Option({
