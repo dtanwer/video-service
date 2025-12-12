@@ -47,6 +47,7 @@ export class UploadVideoController {
       mimetype: file.mimetype,
       sizeBytes: Number(file.size),
     });
+
     await this.commandBus.execute(command);
     return "Video uploaded successfully";
   }
