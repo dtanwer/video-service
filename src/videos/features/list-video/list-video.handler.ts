@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { Video } from '../../entity/video.entity';
 import { ListVideoQuery } from './list-video.query';
 import { ConfigService } from '@nestjs/config';
@@ -18,8 +18,22 @@ export class ListVideoHandler implements IQueryHandler<ListVideoQuery> {
   }
 
   async execute(query: ListVideoQuery) {
-    const { page, limit } = query;
+    const { page, limit, search, tag } = query;
+    const where: any = {};
+
+    if (search) {
+      where.title = ILike(`%${search}%`);
+    }
+
+    if (tag) {
+      where.tags = {
+        name: tag,
+      };
+    }
+
     const [videos, total] = await this.videoRepository.findAndCount({
+      where,
+      relations: ['user', 'tags'],
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
@@ -29,11 +43,17 @@ export class ListVideoHandler implements IQueryHandler<ListVideoQuery> {
       data: videos.map((video: Video) => ({
         id: video.id,
         title: video.title,
-        description: video.description,
+        durationSeconds: video.durationSeconds,
         createdAt: video.createdAt,
         updatedAt: video.updatedAt,
-        url: `${this.baseUrl}/uploads/videos/hls/${video.id}/master.m3u8`,
         thumbnail: `${this.baseUrl}/uploads/videos/hls/${video.id}/thumbnail.jpg`,
+        user: video.user
+          ? {
+            id: video.user.id,
+            name: video.user.name,
+            avatar: video.user.avatar,
+          }
+          : null,
       })),
       meta: {
         total,

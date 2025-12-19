@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
+import { RtmpServerModule } from './rtmp-server/rtmp-server.module';
 import { TypeOrmModule } from './type-orm';
 import { UsersModule } from './users/users.module';
 import { VideoEncoderModule } from './video-encoder/video-encoder.module';
@@ -27,7 +28,8 @@ import { VideosModule } from './videos/features/videos.module';
     UsersModule,
     AdminModule,
     VideosModule,
-    VideoEncoderModule
+    VideoEncoderModule,
+    RtmpServerModule
   ],
 })
-export class AppModule {}
+export class AppModule { }

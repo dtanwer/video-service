@@ -35,6 +35,7 @@ export class UploadVideoController {
     @UploadedFile() file: any,
     @Body('title') title?: string,
     @Body('description') description?: string,
+    @Body('tags') tags?: string[],
     @Req() req?: any,
   ) {
     const command = new UploadVideoCommand({
@@ -46,6 +47,7 @@ export class UploadVideoController {
       filename: file.filename,
       mimetype: file.mimetype,
       sizeBytes: Number(file.size),
+      tags: tags,
     });
 
     await this.commandBus.execute(command);

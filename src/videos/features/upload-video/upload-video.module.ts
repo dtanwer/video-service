@@ -3,11 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UploadVideoController } from './upload-video.controller';
 import { UploadVideoHandler } from './upload-video.handler';
 import { Video } from '../../entity/video.entity';
+import { Tag } from '../../entity/tag.entity';
 import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Video]), CqrsModule],
+  imports: [TypeOrmModule.forFeature([Video, Tag]), CqrsModule],
   controllers: [UploadVideoController],
   providers: [UploadVideoHandler],
 })
-export class UploadVideoModule {} 
+export class UploadVideoModule { } 

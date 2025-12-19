@@ -1,7 +1,7 @@
-import { IsInt, IsOptional, Min, IsString, IsArray } from 'class-validator';
+import { IsInt, IsOptional, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class ListVideoDto {
+export class ListTagsDto {
     @IsOptional()
     @Type(() => Number)
     @IsInt()
@@ -15,10 +15,5 @@ export class ListVideoDto {
     limit?: number = 10;
 
     @IsOptional()
-    @IsString()
     search?: string;
-
-    @IsOptional()
-    @IsString()
-    tag?: string;
 }

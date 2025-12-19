@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { User } from '../../users/user.entity';
+import { VideoEncoderStatus } from './enums/video-encoder-status';
+import { Tag } from './tag.entity';
 
 @Entity('videos')
 export class Video {
@@ -36,6 +38,25 @@ export class Video {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToMany(() => Tag, (tag) => tag.videos, { cascade: true })
+  @JoinTable()
+  tags: Tag[];
+
+  @Column({ default: false })
+  isLive: boolean;
+
+  @Column({ nullable: true })
+  streamKey: string;
+
+  @Column({ nullable: true })
+  rtmpUrl: string;
+
+  @Column({ nullable: true })
+  playbackUrl: string;
+
+  @Column({ default: false })
+  isPublished: boolean;
 
   @UpdateDateColumn()
   updatedAt: Date;

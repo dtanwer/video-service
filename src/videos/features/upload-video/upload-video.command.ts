@@ -9,8 +9,9 @@ export interface UploadVideoPayload {
   filename: string;
   mimetype: string;
   sizeBytes: number;
+  tags?: string[];
 }
 
 export class UploadVideoCommand implements ICommand {
-  constructor(public readonly payload: UploadVideoPayload) {}
+  constructor(public readonly payload: UploadVideoPayload) { }
 }
