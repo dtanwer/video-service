@@ -40,13 +40,17 @@ export class ListVideoHandler implements IQueryHandler<ListVideoQuery> {
     });
 
     return {
-      data: videos.map((video: Video) => ({
+      data: videos.map((video: Video) => {
+        const thumbnail = `${this.baseUrl}/uploads/videos/hls/${video.id}/thumbnail.jpg`;
+        const liveThumbnail = `${this.baseUrl}/uploads/live/${video.id}/thumbnail.jpg`;
+        return{
         id: video.id,
         title: video.title,
+        isLive: video.isLive,
         durationSeconds: video.durationSeconds,
         createdAt: video.createdAt,
         updatedAt: video.updatedAt,
-        thumbnail: `${this.baseUrl}/uploads/videos/hls/${video.id}/thumbnail.jpg`,
+        thumbnail: video.isLive ? liveThumbnail : thumbnail,
         user: video.user
           ? {
             id: video.user.id,
@@ -54,7 +58,8 @@ export class ListVideoHandler implements IQueryHandler<ListVideoQuery> {
             avatar: video.user.avatar,
           }
           : null,
-      })),
+      }
+      }),
       meta: {
         total,
         page,

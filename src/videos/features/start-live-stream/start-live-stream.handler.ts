@@ -3,13 +3,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Video } from '../../entity/video.entity';
 import { StartLiveStreamCommand } from './start-live-stream.command';
+import { ConfigService } from '@nestjs/config';
 
 @CommandHandler(StartLiveStreamCommand)
 export class StartLiveStreamHandler implements ICommandHandler<StartLiveStreamCommand> {
     constructor(
         @InjectRepository(Video)
         private readonly videoRepository: Repository<Video>,
+        private readonly configService: ConfigService,
     ) { }
+
+     get baseUrl() {
+        return this.configService.get<string>('BASE_URL');
+    }
 
     async execute(command: StartLiveStreamCommand): Promise<any> {
         const { userId, title, description } = command;
@@ -24,13 +30,13 @@ export class StartLiveStreamHandler implements ICommandHandler<StartLiveStreamCo
             originalName: `live-${Date.now()}`,
             filename: `live-${Date.now()}`,
             mimetype: 'video/mp4', // Placeholder
-            sizeBytes: 0,
+            sizeBytes: 0,      
         });
         
         await this.videoRepository.save(video);
         
         const rtmpUrl = `rtmp://localhost:1935/live`;
-        const playbackUrl = `http://localhost:8000/live/${video.id}/index.m3u8`;
+        const playbackUrl = `${this.baseUrl}/uploads/live/${video.id}/master.m3u8`;
         
         return {
             videoId: video.id,
