@@ -5,6 +5,10 @@ import { Repository } from "typeorm";
 import * as path from 'path';
 import { HLSVideoConverter } from "../../hls-video-converter/hls-video-converter";
 import { Video } from "src/videos/entity/video.entity";
+import { EventService } from "src/shared/event/event.service";
+import { VideoEncodingStartedEvent } from "src/video-encoder/entities/events/video-encoding-started/video-encoding-started";
+import { VideoEncodingCompletedEvent } from "src/video-encoder/entities/events/video-encoding-completed/video-encoding-completed";
+import { VideoEncodingFailedEvent } from "src/video-encoder/entities/events/video-encoding-failed/video-encoding-failed";
 
 @Injectable()
 export class ProcessVideoHandler {
@@ -12,9 +16,8 @@ export class ProcessVideoHandler {
   constructor(
     @InjectRepository(VideoEncoder)
     private readonly videoEncoderRepository: Repository<VideoEncoder>,
-    @InjectRepository(Video)
-    private readonly videoRepository: Repository<Video>,
     private readonly converter: HLSVideoConverter,
+    private readonly eventService: EventService,
   ) { }
 
   async start(limit: number = 1): Promise<void> {
@@ -31,14 +34,9 @@ export class ProcessVideoHandler {
     }
 
     for (const item of pendingItems) {
-      const video = await this.videoRepository.findOne({ where: { id: item.videoId } });
-      if (!video) {
-        console.error(`Video not found for videoId=${item.videoId}`);
-        continue;
-      }
-
       try {
         await this.updateStatus(item, VideoEncoderStatus.PROCESSING);
+        await this.eventService.publish(new VideoEncodingStartedEvent({ videoId: item.videoId }));
 
         const sourcePath = item.fileUrl; // absolute or project-relative path stored in DB
         const outputPath = path.join(
@@ -52,6 +50,7 @@ export class ProcessVideoHandler {
         item.isCompleted = true;
         item.error = null;
         await this.updateStatus(item, VideoEncoderStatus.COMPLETED);
+        await this.eventService.publish(new VideoEncodingCompletedEvent({ videoId: item.videoId }));
 
         console.log(`Processed videoId=${item.videoId} → ${outputPath}`);
       } catch (err) {
@@ -59,6 +58,7 @@ export class ProcessVideoHandler {
         item.error = message?.slice(0, 1000);
         item.isCompleted = false;
         await this.updateStatus(item, VideoEncoderStatus.FAILED);
+        await this.eventService.publish(new VideoEncodingFailedEvent({ videoId: item.videoId }, message));
         console.error(`Failed processing videoId=${item.videoId}:`, message);
       }
     }

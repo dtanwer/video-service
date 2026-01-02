@@ -1,5 +1,8 @@
 import { Injectable, OnModuleInit, Logger, OnModuleDestroy } from '@nestjs/common';
 import { LiveHLSConverter, } from './live-hls-conveter';
+import { EventService } from '../shared/event/event.service';
+import { StreamStartedEvent } from './events/stream-started.event';
+import { StreamStoppedEvent } from './events/stream-stopped.event';
 
 const NodeMediaServer = require('node-server-media');
 
@@ -8,7 +11,10 @@ export class RtmpServerService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(RtmpServerService.name);
     private nms: any;
 
-    constructor(private readonly liveConverter: LiveHLSConverter) { }
+    constructor(
+        private readonly liveConverter: LiveHLSConverter,
+        private readonly eventService: EventService,
+    ) { }
 
     onModuleInit() {
         const config = {
@@ -85,6 +91,7 @@ export class RtmpServerService implements OnModuleInit, OnModuleDestroy {
 
                 // Start HLS conversion
                 await this.liveConverter.startStream(streamKey, rtmpUrl);
+                this.eventService.publish(new StreamStartedEvent(streamKey));
 
                 this.logger.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
                 this.logger.log('✓ Live stream ready!');
@@ -106,6 +113,7 @@ export class RtmpServerService implements OnModuleInit, OnModuleDestroy {
 
                 // Stop HLS conversion
                 await this.liveConverter.stopStream(streamKey);
+                this.eventService.publish(new StreamStoppedEvent(streamKey));
 
                 this.logger.log('✓ Stream stopped and cleaned up');
                 this.logger.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
@@ -151,7 +159,7 @@ export class RtmpServerService implements OnModuleInit, OnModuleDestroy {
     /**
      * Get active streams info
      */
-    getActiveStreams():any {
+    getActiveStreams(): any {
         return this.liveConverter.getAllActiveStreams();
     }
 

@@ -10,6 +10,7 @@ import { TypeOrmModule } from './type-orm';
 import { UsersModule } from './users/users.module';
 import { VideoEncoderModule } from './video-encoder/video-encoder.module';
 import { VideosModule } from './videos/features/videos.module';
+import { SharedEventModule } from './shared/event/event.module';
 
 
 @Module({
@@ -29,7 +30,9 @@ import { VideosModule } from './videos/features/videos.module';
     AdminModule,
     VideosModule,
     VideoEncoderModule,
-    RtmpServerModule
+    VideoEncoderModule,
+    RtmpServerModule,
+    SharedEventModule
   ],
 })
 export class AppModule { }

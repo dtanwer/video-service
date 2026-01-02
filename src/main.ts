@@ -1,5 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './shared/filters/all-exceptions.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -15,7 +16,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const PORT = process.env.PORT || 3001;
-  
+
   // Enable CORS for frontend
   app.enableCors({
     origin: '*',
@@ -29,7 +30,9 @@ async function bootstrap() {
   if (!existsSync(uploadDir)) {
     mkdirSync(uploadDir, { recursive: true });
   }
+
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
+  
 
   // Global validation pipe
   app.useGlobalPipes(new ValidationPipe({
@@ -38,6 +41,10 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
 
+  // Global exception filter
+  const httpAdapter = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('User Auth API')
@@ -45,7 +52,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

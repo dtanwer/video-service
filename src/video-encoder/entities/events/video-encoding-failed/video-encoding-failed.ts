@@ -1,6 +1,5 @@
 import { IEvent } from '@nestjs/cqrs';
-import { Video } from 'src/videos/entity/video.entity';
 
 export class VideoEncodingFailedEvent implements IEvent {
-    constructor(public readonly video: Video, public readonly error: string) { }
+    constructor(public readonly video: {videoId: string, }, public readonly error: string) { }
 }

@@ -1,12 +1,14 @@
-import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { Injectable } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { VideoUploadedEvent } from './video-uploaded';
 import { CommandBus } from '@nestjs/cqrs';
 import { EncodeVideoCommand } from '../../../../video-encoder/features/encode-video/encode-video.command';
 
-@EventsHandler(VideoUploadedEvent)
-export class VideoUploadedHandler implements IEventHandler<VideoUploadedEvent> {
-  constructor(private readonly commandBus: CommandBus) {}
+@Injectable()
+export class VideoUploadedHandler {
+  constructor(private readonly commandBus: CommandBus) { }
 
+  @OnEvent(VideoUploadedEvent.name)
   async handle(event: VideoUploadedEvent) {
     console.log("Handling video Uploaded Event .....");
     const video = event.video;

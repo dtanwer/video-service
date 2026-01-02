@@ -5,7 +5,7 @@ import { Video } from '../../entity/video.entity';
 import { Tag } from '../../entity/tag.entity';
 import { UploadVideoCommand } from './upload-video.command';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { EventBus } from '@nestjs/cqrs';
+import { EventService } from '../../../shared/event/event.service';
 import { VideoUploadedEvent } from '../../entity/event/video-uploaded/video-uploaded';
 
 @CommandHandler(UploadVideoCommand)
@@ -15,7 +15,7 @@ export class UploadVideoHandler implements ICommandHandler<UploadVideoCommand> {
     private readonly videoRepository: Repository<Video>,
     @InjectRepository(Tag)
     private readonly tagRepository: Repository<Tag>,
-    private readonly eventBus: EventBus,
+    private readonly eventService: EventService,
   ) { }
 
   async execute(command: UploadVideoCommand): Promise<Video> {
@@ -36,7 +36,7 @@ export class UploadVideoHandler implements ICommandHandler<UploadVideoCommand> {
     }
 
     const saved = await this.videoRepository.save(entity);
-    await this.eventBus.publish(new VideoUploadedEvent(saved));
+    await this.eventService.publish(new VideoUploadedEvent(saved));
     return saved;
   }
 } 

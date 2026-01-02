@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Video } from '../../entity/video.entity';
 import { StartLiveStreamController } from './start-live-stream.controller';
 import { StartLiveStreamHandler } from './start-live-stream.handler';
+import { StreamStartedHandler } from './events/stream-started.handler';
+import { StreamStoppedHandler } from './events/stream-stopped.handler';
 
 @Module({
     imports: [
@@ -11,6 +13,10 @@ import { StartLiveStreamHandler } from './start-live-stream.handler';
         TypeOrmModule.forFeature([Video]),
     ],
     controllers: [StartLiveStreamController],
-    providers: [StartLiveStreamHandler],
+    providers: [
+        StartLiveStreamHandler,
+        StreamStartedHandler,
+        StreamStoppedHandler,
+    ],
 })
 export class StartLiveStreamModule { }

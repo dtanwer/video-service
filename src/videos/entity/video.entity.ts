@@ -46,6 +46,13 @@ export class Video {
   @Column({ default: false })
   isLive: boolean;
 
+  @Column({
+    type: 'enum',
+    enum: VideoEncoderStatus,
+    default: VideoEncoderStatus.PENDING
+  })
+  status: VideoEncoderStatus;
+
   @Column({ nullable: true })
   streamKey: string;
 
