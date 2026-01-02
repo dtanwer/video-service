@@ -19,6 +19,7 @@ export class VideoEncodingCompletedHandler {
         await this.videoRepository.update(event.video.videoId, {
             status: VideoEncoderStatus.COMPLETED,
             isPublished: true, // Optionally publish automatically
+            playbackUrl: event.video.playbackUrl,
         });
     }
 }

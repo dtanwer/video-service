@@ -19,7 +19,9 @@ export class ListVideoHandler implements IQueryHandler<ListVideoQuery> {
 
   async execute(query: ListVideoQuery) {
     const { page, limit, search, tag } = query;
-    const where: any = {};
+    const where: any = {
+      isPublished: true,
+    };
 
     if (search) {
       where.title = ILike(`%${search}%`);

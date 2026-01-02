@@ -50,7 +50,7 @@ export class UploadVideoController {
       tags: tags,
     });
 
-    await this.commandBus.execute(command);
-    return "Video uploaded successfully";
+    const video= await this.commandBus.execute(command);
+    return video;
   }
 } 

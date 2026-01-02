@@ -4,11 +4,11 @@ import { VideoEncoder, VideoEncoderStatus } from "src/video-encoder/entities/vid
 import { Repository } from "typeorm";
 import * as path from 'path';
 import { HLSVideoConverter } from "../../hls-video-converter/hls-video-converter";
-import { Video } from "src/videos/entity/video.entity";
 import { EventService } from "src/shared/event/event.service";
 import { VideoEncodingStartedEvent } from "src/video-encoder/entities/events/video-encoding-started/video-encoding-started";
 import { VideoEncodingCompletedEvent } from "src/video-encoder/entities/events/video-encoding-completed/video-encoding-completed";
 import { VideoEncodingFailedEvent } from "src/video-encoder/entities/events/video-encoding-failed/video-encoding-failed";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class ProcessVideoHandler {
@@ -18,6 +18,7 @@ export class ProcessVideoHandler {
     private readonly videoEncoderRepository: Repository<VideoEncoder>,
     private readonly converter: HLSVideoConverter,
     private readonly eventService: EventService,
+    private readonly configService: ConfigService
   ) { }
 
   async start(limit: number = 1): Promise<void> {
@@ -34,33 +35,45 @@ export class ProcessVideoHandler {
     }
 
     for (const item of pendingItems) {
-      try {
-        await this.updateStatus(item, VideoEncoderStatus.PROCESSING);
-        await this.eventService.publish(new VideoEncodingStartedEvent({ videoId: item.videoId }));
+      await this.processVideo(item.videoId);
+    }
+  }
 
-        const sourcePath = item.fileUrl; // absolute or project-relative path stored in DB
-        const outputPath = path.join(
-          path.dirname(sourcePath),
-          "hls",
-          item.videoId
-        );
+  async processVideo(videoId: string): Promise<void> {
+    const item = await this.videoEncoderRepository.findOne({ where: { videoId } });
+    if (!item) {
+      console.error(`VideoEncoder entry not found for videoId=${videoId}`);
+      return;
+    }
 
-        await this.converter.convert(sourcePath, item.videoId);
+    try {
+      await this.updateStatus(item, VideoEncoderStatus.PROCESSING);
+      await this.eventService.publish(new VideoEncodingStartedEvent({ videoId: item.videoId }));
 
-        item.isCompleted = true;
-        item.error = null;
-        await this.updateStatus(item, VideoEncoderStatus.COMPLETED);
-        await this.eventService.publish(new VideoEncodingCompletedEvent({ videoId: item.videoId }));
+      const sourcePath = item.fileUrl; // absolute or project-relative path stored in DB
+      const outputPath = path.join(
+        path.dirname(sourcePath),
+        "hls",
+        item.videoId
+      );
 
-        console.log(`Processed videoId=${item.videoId} → ${outputPath}`);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        item.error = message?.slice(0, 1000);
-        item.isCompleted = false;
-        await this.updateStatus(item, VideoEncoderStatus.FAILED);
-        await this.eventService.publish(new VideoEncodingFailedEvent({ videoId: item.videoId }, message));
-        console.error(`Failed processing videoId=${item.videoId}:`, message);
-      }
+      await this.converter.convert(sourcePath, item.videoId);
+
+      item.isCompleted = true;
+      item.error = null;
+      await this.updateStatus(item, VideoEncoderStatus.COMPLETED);
+
+      const playbackUrl = `${this.configService.get<string>('BASE_URL')}/uploads/videos/hls/${item.videoId}/master.m3u8`;
+      await this.eventService.publish(new VideoEncodingCompletedEvent({ videoId: item.videoId, playbackUrl }));
+
+      console.log(`Processed videoId=${item.videoId} → ${outputPath}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      item.error = message?.slice(0, 1000);
+      item.isCompleted = false;
+      await this.updateStatus(item, VideoEncoderStatus.FAILED);
+      await this.eventService.publish(new VideoEncodingFailedEvent({ videoId: item.videoId }, message));
+      console.error(`Failed processing videoId=${item.videoId}:`, message);
     }
   }
 

@@ -29,9 +29,7 @@ export class GetVideoHandler implements IQueryHandler<GetVideoQuery> {
             throw new NotFoundException('Video not found');
         }
 
-        const videoUrl = `${this.baseUrl}/uploads/videos/hls/${video.id}/master.m3u8`;
-        const liveVideoUrl = `${this.baseUrl}/uploads/live/${video.id}/master.m3u8`;
-
+        
         return {
             id: video.id,
             title: video.title,
@@ -40,7 +38,8 @@ export class GetVideoHandler implements IQueryHandler<GetVideoQuery> {
             durationSeconds: video.durationSeconds,
             createdAt: video.createdAt,
             updatedAt: video.updatedAt,
-            url: video.isLive ? liveVideoUrl : videoUrl,
+            url: video?.playbackUrl,
+            status: video.status,
             thumbnail: `${this.baseUrl}/uploads/videos/hls/${video.id}/thumbnail.jpg`,
             user: video.user
                 ? {

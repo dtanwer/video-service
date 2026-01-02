@@ -3,7 +3,7 @@ import { LiveHLSConverter, } from './live-hls-conveter';
 import { EventService } from '../shared/event/event.service';
 import { StreamStartedEvent } from './events/stream-started.event';
 import { StreamStoppedEvent } from './events/stream-stopped.event';
-
+import { ConfigService } from '@nestjs/config';
 const NodeMediaServer = require('node-server-media');
 
 @Injectable()
@@ -14,6 +14,7 @@ export class RtmpServerService implements OnModuleInit, OnModuleDestroy {
     constructor(
         private readonly liveConverter: LiveHLSConverter,
         private readonly eventService: EventService,
+        private readonly configService: ConfigService
     ) { }
 
     onModuleInit() {
@@ -91,11 +92,12 @@ export class RtmpServerService implements OnModuleInit, OnModuleDestroy {
 
                 // Start HLS conversion
                 await this.liveConverter.startStream(streamKey, rtmpUrl);
-                this.eventService.publish(new StreamStartedEvent(streamKey));
+                const playbackUrl = `${this.configService.get<string>('BASE_URL')}/live/${streamKey}/master.m3u8`;
+                this.eventService.publish(new StreamStartedEvent(streamKey, playbackUrl));
 
                 this.logger.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
                 this.logger.log('✓ Live stream ready!');
-                this.logger.log(`  HLS Playlist: http://localhost:8000/live/${streamKey}/master.m3u8`);
+                this.logger.log(`  HLS Playlist: ${this.configService.get<string>('BASE_URL')}/live/${streamKey}/master.m3u8`);
                 this.logger.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
             } catch (error) {
                 this.logger.error(`[postPublish] Failed to start HLS conversion:`, error);

@@ -17,7 +17,7 @@ export class StreamStartedHandler {
         console.log(`Handling StreamStartedEvent for streamKey=${event.streamKey}`);
         // Assuming streamKey is the videoId or we can find video by streamKey
         // If streamKey is videoId:
-        await this.videoRepository.update({ id: event.streamKey }, { isLive: true });
+        await this.videoRepository.update({ id: event.streamKey }, { isLive: true,playbackUrl: event.playbackUrl,isPublished: true });
 
         // If streamKey is separate column:
         // await this.videoRepository.update({ streamKey: event.streamKey }, { isLive: true });

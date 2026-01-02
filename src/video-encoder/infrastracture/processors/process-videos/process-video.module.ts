@@ -24,6 +24,9 @@ import { CqrsModule } from "@nestjs/cqrs";
         ProcessVideo,
         ProcessVideoHandler,
         HLSVideoConverter
+    ],
+    exports: [
+        ProcessVideoHandler
     ]
 })
 
