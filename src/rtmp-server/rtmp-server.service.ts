@@ -97,7 +97,7 @@ export class RtmpServerService implements OnModuleInit, OnModuleDestroy {
 
                 this.logger.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
                 this.logger.log('✓ Live stream ready!');
-                this.logger.log(`  HLS Playlist: ${this.configService.get<string>('BASE_URL')}/live/${streamKey}/master.m3u8`);
+                this.logger.log(`  HLS Playlist: ${playbackUrl}`);
                 this.logger.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
             } catch (error) {
                 this.logger.error(`[postPublish] Failed to start HLS conversion:`, error);

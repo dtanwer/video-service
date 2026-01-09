@@ -1,5 +1,8 @@
 import { IQuery } from '@nestjs/cqrs';
 
 export class GetVideoQuery implements IQuery {
-    constructor(public readonly videoId: string) { }
+    constructor(
+        public readonly videoId: string,
+        public readonly userId?: string
+    ) { }
 }

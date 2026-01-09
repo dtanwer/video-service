@@ -41,6 +41,19 @@ export class User {
   @Column({ default: false })
   isBanned: boolean;
 
+  @Column({
+    type: 'enum',
+    enum: ['FREE', 'BASIC', 'PREMIUM'],
+    default: 'FREE'
+  })
+  subscriptionPlan: string;
+
+  @Column({ nullable: true })
+  subscriptionExpiry: Date;
+
+  @Column({ nullable: true })
+  razorpayCustomerId: string;
+
   @OneToMany(() => Video, (video) => video.user)
   videos: Video[];
 

@@ -65,6 +65,18 @@ export class Video {
   @Column({ default: false })
   isPublished: boolean;
 
+  @Column({ default: false })
+  isPaid: boolean;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  price: number;
+
+  @Column({ default: false })
+  isSubscriptionOnly: boolean;
+
+  @Column({ nullable: true })
+  previewDuration: number;
+
   @UpdateDateColumn()
   updatedAt: Date;
 } 
