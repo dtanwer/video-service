@@ -12,7 +12,6 @@ import { VideoEncoderModule } from './video-encoder/video-encoder.module';
 import { VideosModule } from './videos/features/videos.module';
 import { SharedEventModule } from './shared/event/event.module';
 import { PaymentsModule } from './payments/payments.module';
-import { PlaylistsModule } from './playlists/playlists.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
 
@@ -39,7 +38,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     RtmpServerModule,
     SharedEventModule,
     PaymentsModule,
-    PlaylistsModule,
     ScheduleModule.forRoot()
   ],
 })

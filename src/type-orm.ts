@@ -4,7 +4,7 @@ import { User } from './users/user.entity';
 import { Video } from './videos/entity/video.entity';
 import { VideoEncoder } from './video-encoder/entities/video-encoder.entity';
 import { Tag } from './videos/entity/tag.entity';
-import { Playlist } from './playlists/entities/playlist.entity';
+import { Playlist } from './videos/entity/playlist.entity';
 import { Transaction } from './payments/entities/transaction.entity';
 
 @Module({
