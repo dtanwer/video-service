@@ -52,6 +52,8 @@ export class ListVideoHandler implements IQueryHandler<ListVideoQuery> {
         durationSeconds: video.durationSeconds,
         createdAt: video.createdAt,
         updatedAt: video.updatedAt,
+        isPublished: video.isPublished,
+        isPaid: video.isPaid,
         thumbnail: video.isLive ? liveThumbnail : thumbnail,
         user: video.user
           ? {

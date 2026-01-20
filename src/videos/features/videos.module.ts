@@ -18,6 +18,7 @@ import { DeletePlaylistController } from './delete-playlist/delete-playlist.cont
 import { AddVideoToPlaylistController } from './add-video-to-playlist/add-video-to-playlist.controller';
 import { RemoveVideoFromPlaylistController } from './remove-video-from-playlist/remove-video-from-playlist.controller';
 import { GetPlaylistController } from './get-playlist/get-playlist.controller';
+import { GetSignedUrlController } from './get-signed-url/get-signed-url.controller';
 
 import { CreatePlaylistHandler } from './create-playlist/create-playlist.handler';
 import { UpdatePlaylistHandler } from './update-playlist/update-playlist.handler';
@@ -26,6 +27,7 @@ import { AddVideoToPlaylistHandler } from './add-video-to-playlist/add-video-to-
 import { RemoveVideoFromPlaylistHandler } from './remove-video-from-playlist/remove-video-from-playlist.handler';
 import { GetPlaylistHandler } from './get-playlist/get-playlist.handler';
 import { GetPlaylistsHandler } from './get-playlist/get-playlists.handler';
+import { VideoAccessModule } from '../services/video-access.module';
 
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { GetPlaylistsHandler } from './get-playlist/get-playlists.handler';
     StartLiveStreamModule,
     CqrsModule,
     TypeOrmModule.forFeature([Video, Playlist]),
+    VideoAccessModule,
   ],
   providers: [
     VideoEncodingStartedHandler,
@@ -56,6 +59,7 @@ import { GetPlaylistsHandler } from './get-playlist/get-playlists.handler';
     AddVideoToPlaylistController,
     RemoveVideoFromPlaylistController,
     GetPlaylistController,
+    GetSignedUrlController,
   ],
 })
 export class VideosModule { } 

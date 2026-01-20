@@ -13,6 +13,9 @@ export class Playlist {
     @Column({ nullable: true })
     description: string;
 
+    @Column({ nullable: true })
+    image: string;
+
     @Column({ default: false })
     isPaid: boolean;
 
