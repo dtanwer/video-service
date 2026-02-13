@@ -13,6 +13,7 @@ import { VideosModule } from './videos/features/videos.module';
 import { SharedEventModule } from './shared/event/event.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { WalletModule } from './wallet/wallet.module';
 
 
 @Module({
@@ -37,7 +38,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     VideoEncoderModule,
     RtmpServerModule,
     SharedEventModule,
+    SharedEventModule,
     PaymentsModule,
+    WalletModule,
     ScheduleModule.forRoot()
   ],
 })

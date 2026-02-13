@@ -19,4 +19,17 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   avatar?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  bankDetails?: {
+    accountNumber: string;
+    ifsc: string;
+    beneficiaryName: string;
+  };
 }

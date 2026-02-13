@@ -54,6 +54,22 @@ export class User {
   @Column({ nullable: true })
   razorpayCustomerId: string;
 
+  @Column({ nullable: true })
+  razorpayContactId: string;
+
+  @Column({ nullable: true })
+  razorpayFundAccountId: string;
+
+  @Column({ nullable: true })
+  phoneNumber: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  bankDetails: {
+    accountNumber: string;
+    ifsc: string;
+    beneficiaryName: string;
+  };
+
   @OneToMany(() => Video, (video) => video.user)
   videos: Video[];
 

@@ -20,6 +20,10 @@ import { RemoveVideoFromPlaylistController } from './remove-video-from-playlist/
 import { GetPlaylistController } from './get-playlist/get-playlist.controller';
 import { GetSignedUrlController } from './get-signed-url/get-signed-url.controller';
 
+import { UpdateVideoController } from './update-video/update-video.controller';
+import { TogglePublishController } from './toggle-publish/toggle-publish.controller';
+import { DeleteVideoController } from './delete-video/delete-video.controller';
+
 import { CreatePlaylistHandler } from './create-playlist/create-playlist.handler';
 import { UpdatePlaylistHandler } from './update-playlist/update-playlist.handler';
 import { DeletePlaylistHandler } from './delete-playlist/delete-playlist.handler';
@@ -28,6 +32,13 @@ import { RemoveVideoFromPlaylistHandler } from './remove-video-from-playlist/rem
 import { GetPlaylistHandler } from './get-playlist/get-playlist.handler';
 import { GetPlaylistsHandler } from './get-playlist/get-playlists.handler';
 import { VideoAccessModule } from '../services/video-access.module';
+
+import { UpdateVideoHandler } from './update-video/update-video.handler';
+import { TogglePublishHandler } from './toggle-publish/toggle-publish.handler';
+import { DeleteVideoHandler } from './delete-video/delete-video.handler';
+import { GetMyVideosController } from './get-my-videos/get-my-videos.controller';
+import { GetMyVideosHandler } from './get-my-videos/get-my-videos.handler';
+
 
 @Module({
   imports: [
@@ -51,6 +62,10 @@ import { VideoAccessModule } from '../services/video-access.module';
     RemoveVideoFromPlaylistHandler,
     GetPlaylistHandler,
     GetPlaylistsHandler,
+    UpdateVideoHandler,
+    TogglePublishHandler,
+    DeleteVideoHandler,
+    GetMyVideosHandler,
   ],
   controllers: [
     CreatePlaylistController,
@@ -60,6 +75,10 @@ import { VideoAccessModule } from '../services/video-access.module';
     RemoveVideoFromPlaylistController,
     GetPlaylistController,
     GetSignedUrlController,
+    UpdateVideoController,
+    TogglePublishController,
+    DeleteVideoController,
+    GetMyVideosController,
   ],
 })
 export class VideosModule { } 

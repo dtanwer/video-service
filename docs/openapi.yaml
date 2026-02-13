@@ -1,0 +1,249 @@
+openapi: 3.0.0
+info:
+  title: User Auth API
+  description: User Management, Video Streaming, and Wallet API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001
+    description: Local Development Server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegisterDto:
+      type: object
+      required: [email, password, name]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 6 }
+        name: { type: string }
+    LoginDto:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+    RefreshTokenDto:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken: { type: string }
+    UpdateProfileDto:
+      type: object
+      properties:
+        name: { type: string }
+        bio: { type: string }
+        avatar: { type: string }
+    ChangePasswordDto:
+      type: object
+      required: [oldPassword, newPassword]
+      properties:
+        oldPassword: { type: string }
+        newPassword: { type: string, minLength: 6 }
+    CreatePlaylistDto:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        videos: 
+          type: array
+          items: { type: string }
+          description: Array of Video IDs
+        isPublic: { type: boolean }
+security:
+  - bearerAuth: []
+paths:
+  # Auth
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterDto' }
+      responses:
+        '201': { description: User registered successfully }
+        '409': { description: User already exists }
+  /auth/login:
+    post:
+      summary: Login user
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginDto' }
+      responses:
+        '200': 
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken: { type: string }
+                  refreshToken: { type: string }
+                  user: { type: object }
+        '401': { description: Invalid credentials }
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshTokenDto' }
+      responses:
+        '200': { description: Token refreshed }
+        '401': { description: Invalid refresh token }
+
+  # Users
+  /users/me:
+    get:
+      summary: Get current user profile
+      tags: [Users]
+      responses:
+        '200': { description: User profile retrieved }
+    put:
+      summary: Update user profile
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateProfileDto' }
+      responses:
+        '200': { description: Profile updated }
+  /users/change-password:
+    put:
+      summary: Change user password
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChangePasswordDto' }
+      responses:
+        '200': { description: Password changed }
+
+  # Videos
+  /video:
+    post:
+      summary: Upload a video
+      tags: [Videos]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+                title: { type: string }
+                description: { type: string }
+                tags: { type: array, items: { type: string } }
+      responses:
+        '201': { description: Video uploaded and processing started }
+  /videos/my-videos:
+    get:
+      summary: Get current user's uploaded videos
+      tags: [Videos]
+      parameters:
+        - { in: query, name: page, schema: { type: integer, default: 1 } }
+        - { in: query, name: limit, schema: { type: integer, default: 10 } }
+        - { in: query, name: search, schema: { type: string } }
+        - { in: query, name: status, schema: { type: string, enum: [processing, completed, failed] } }
+        - { in: query, name: visibility, schema: { type: string, enum: [public, private, unlisted] } }
+      responses:
+        '200': { description: List of user videos }
+  /videos:
+    get:
+      summary: List public videos
+      tags: [Videos]
+      security: []
+      parameters:
+        - { in: query, name: page, schema: { type: integer, default: 1 } }
+        - { in: query, name: limit, schema: { type: integer, default: 10 } }
+        - { in: query, name: search, schema: { type: string } }
+        - { in: query, name: tag, schema: { type: string } }
+      responses:
+        '200': { description: List of videos }
+
+  # Playlists
+  /playlists:
+    post:
+      summary: Create a playlist
+      tags: [Playlists]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                image: { type: string, format: binary }
+                name: { type: string }
+                description: { type: string }
+                isPublic: { type: boolean }
+                videos: { type: array, items: { type: string } }
+      responses:
+        '201': { description: Playlist created }
+    get:
+      summary: Get all playlists
+      tags: [Playlists]
+      security: []
+      responses:
+        '200': { description: List of playlists }
+  /playlists/{id}:
+    get:
+      summary: Get playlist details
+      tags: [Playlists]
+      security: []
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Playlist details }
+
+  # Wallet
+  /wallet:
+    get:
+      summary: Get wallet balance
+      tags: [Wallet]
+      responses:
+        '200': 
+          description: Wallet balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance: { type: number }
+                  currency: { type: string }
+  /wallet/withdraw:
+    post:
+      summary: Request withdrawal
+      tags: [Wallet]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount: { type: number, minimum: 1 }
+      responses:
+        '201': { description: Withdrawal requested }
+        '400': { description: Invalid amount or insufficient funds }

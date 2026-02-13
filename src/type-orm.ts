@@ -6,6 +6,9 @@ import { VideoEncoder } from './video-encoder/entities/video-encoder.entity';
 import { Tag } from './videos/entity/tag.entity';
 import { Playlist } from './videos/entity/playlist.entity';
 import { Transaction } from './payments/entities/transaction.entity';
+import { Wallet } from './wallet/entities/wallet.entity';
+import { WalletTransaction } from './wallet/entities/wallet-transaction.entity';
+import { Payout } from './wallet/entities/payout.entity';
 
 @Module({
   imports: [
@@ -16,7 +19,7 @@ import { Transaction } from './payments/entities/transaction.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'youtube',
-      entities: [User, Video, VideoEncoder, Tag, Playlist, Transaction],
+      entities: [User, Video, VideoEncoder, Tag, Playlist, Transaction, Wallet, WalletTransaction, Payout],
       synchronize: true, // Set to false in production
       // logging: true,
     }),
